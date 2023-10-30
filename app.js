@@ -6,20 +6,19 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const onlineUsers = new Set(); // Daftar pengguna online
+const onlineUsers = new Set();
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
 io.on('connection', (socket) => {
-  onlineUsers.add(socket.id); // Menambahkan pengguna ke daftar pengguna online
+  onlineUsers.add(socket.id);
 
-  // Kirim jumlah pengguna online ke semua klien
   io.emit('online-users', onlineUsers.size);
 
   socket.on('disconnect', () => {
-    onlineUsers.delete(socket.id); // Menghapus pengguna dari daftar pengguna online
+    onlineUsers.delete(socket.id); 
     io.emit('online-users', onlineUsers.size);
   });
 });
