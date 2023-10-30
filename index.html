@@ -29,33 +29,52 @@
     const socket = io();
     const activeUsersContainer = document.getElementById('activeUsersContainer');
     const userCountElement = document.getElementById('userCount');
+    const userAbbreviations = {}; // Store user abbreviations based on user ID
 
-    socket.on('online-users', (count) => {
+    socket.on('online-users', (users) => {
       // Update the text displaying the active user count
-      userCountElement.textContent = count;
+      userCountElement.textContent = users.length;
 
       // Remove all circles before adding new ones
       activeUsersContainer.innerHTML = '';
 
-      for (let i = 0; i < count; i++) {
+      users.forEach((user) => {
         const circle = document.createElement('div');
         circle.className = 'circle';
 
         const userIcon = document.createElement('div');
         userIcon.className = 'user-icon';
-        userIcon.textContent = generateRandomInitials(); // Generate random initials for the user
+
+        const userId = user.id;
+        if (!userAbbreviations[userId]) {
+          userAbbreviations[userId] = generateUniqueLetter(userId);
+        }
+
+        userIcon.textContent = userAbbreviations[userId];
 
         circle.appendChild(userIcon);
 
         activeUsersContainer.appendChild(circle);
-      }
+      });
     });
 
-    // Function to generate random 2-letter initials for the user
-    function generateRandomInitials() {
+    // Function to generate unique single-letter abbreviation for the user based on user ID
+    function generateUniqueLetter(userId) {
       const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      const initials = alphabet.charAt(Math.floor(Math.random() * 26)) + alphabet.charAt(Math.floor(Math.random() * 26));
-      return initials;
+      // Use a hash of the user ID to create a unique single letter abbreviation
+      const index = hashUserId(userId) % 26;
+      const abbreviation = alphabet.charAt(index);
+      return abbreviation;
+    }
+
+    // Function to hash the user ID
+    function hashUserId(userId) {
+      // You can use a proper hashing function here for better results
+      let hash = 0;
+      for (let i = 0; i < userId.length; i++) {
+        hash = (hash << 5) - hash + userId.charCodeAt(i);
+      }
+      return hash;
     }
   </script>
 </body>
