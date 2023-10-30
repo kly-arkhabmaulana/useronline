@@ -31,23 +31,32 @@
     const userCountElement = document.getElementById('userCount');
 
     socket.on('online-users', (count) => {
-      // Update teks hitungan pengguna aktif
+      // Update the text displaying the active user count
       userCountElement.textContent = count;
 
-      // Hapus semua lingkaran sebelum menambahkan yang baru
+      // Remove all circles before adding new ones
       activeUsersContainer.innerHTML = '';
 
       for (let i = 0; i < count; i++) {
         const circle = document.createElement('div');
         circle.className = 'circle';
 
-        const userIcon = document.createElement('i');
-        userIcon.className = 'fas fa-user user-icon';
+        const userIcon = document.createElement('div');
+        userIcon.className = 'user-icon';
+        userIcon.textContent = generateRandomInitials(); // Generate random initials for the user
+
         circle.appendChild(userIcon);
 
         activeUsersContainer.appendChild(circle);
       }
     });
+
+    // Function to generate random 2-letter initials for the user
+    function generateRandomInitials() {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const initials = alphabet.charAt(Math.floor(Math.random() * 26)) + alphabet.charAt(Math.floor(Math.random() * 26));
+      return initials;
+    }
   </script>
 </body>
 </html>
