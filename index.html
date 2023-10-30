@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Active Users</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+  <style>
+    .circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #9370DB;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px;
+    }
+
+    .user-icon {
+      font-size: 48px;
+      color: #FFF;
+    }
+  </style>
+</head>
+<body>
+  <h1>Active Users: <span id="userCount">0</span></h1>
+  <div id="activeUsersContainer"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const activeUsersContainer = document.getElementById('activeUsersContainer');
+    const userCountElement = document.getElementById('userCount');
+
+    socket.on('online-users', (count) => {
+      // Update teks hitungan pengguna aktif
+      userCountElement.textContent = count;
+
+      // Hapus semua lingkaran sebelum menambahkan yang baru
+      activeUsersContainer.innerHTML = '';
+
+      for (let i = 0; i < count; i++) {
+        const circle = document.createElement('div');
+        circle.className = 'circle';
+
+        const userIcon = document.createElement('i');
+        userIcon.className = 'fas fa-user user-icon';
+        circle.appendChild(userIcon);
+
+        activeUsersContainer.appendChild(circle);
+      }
+    });
+  </script>
+</body>
+</html>
