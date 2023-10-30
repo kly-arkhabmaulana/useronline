@@ -13,11 +13,14 @@
       justify-content: center;
       align-items: center;
       margin: 10px;
+      color: #FFF;
+      font-weight: bold;
+      font-family: 'sans-serif', sans-serif;
+      font-size: 300%; /* Set font size as 300% of the container's height */
     }
 
     .user-icon {
       font-size: 48px;
-      color: #FFF;
     }
   </style>
 </head>
@@ -30,23 +33,33 @@
     const activeUsersContainer = document.getElementById('activeUsersContainer');
     const userCountElement = document.getElementById('userCount');
 
-    socket.on('online-users', (count) => {
-      // Update teks hitungan pengguna aktif
+    function updateCirclesAndCounter(count) {
       userCountElement.textContent = count;
 
-      // Hapus semua lingkaran sebelum menambahkan yang baru
       activeUsersContainer.innerHTML = '';
 
-      for (let i = 0; i < count; i++) {
+      const initialCircleCount = Math.min(3, count);
+      for (let i = 0; i < initialCircleCount; i++) {
         const circle = document.createElement('div');
         circle.className = 'circle';
 
-        const userIcon = document.createElement('i');
-        userIcon.className = 'fas fa-user user-icon';
-        circle.appendChild(userIcon);
+        const randomAlphabet = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+
+        circle.textContent = randomAlphabet;
 
         activeUsersContainer.appendChild(circle);
       }
+
+      if (count > 3) {
+        const counter = document.createElement('div');
+        counter.className = 'circle';
+        counter.textContent = `+${count - 3}`;
+        activeUsersContainer.appendChild(counter);
+      }
+    }
+
+    socket.on('online-users', (count) => {
+      updateCirclesAndCounter(count);
     });
   </script>
 </body>
