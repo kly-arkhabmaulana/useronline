@@ -29,53 +29,25 @@
     const socket = io();
     const activeUsersContainer = document.getElementById('activeUsersContainer');
     const userCountElement = document.getElementById('userCount');
-    const userAbbreviations = {}; // Store user abbreviations based on user ID
 
-    socket.on('online-users', (users) => {
-      // Update the text displaying the active user count
-      userCountElement.textContent = users.length;
+    socket.on('online-users', (count) => {
+      // Update teks hitungan pengguna aktif
+      userCountElement.textContent = count;
 
-      // Remove all circles before adding new ones
+      // Hapus semua lingkaran sebelum menambahkan yang baru
       activeUsersContainer.innerHTML = '';
 
-      users.forEach((user) => {
+      for (let i = 0; i < count; i++) {
         const circle = document.createElement('div');
         circle.className = 'circle';
 
-        const userIcon = document.createElement('div');
-        userIcon.className = 'user-icon';
-
-        const userId = user.id;
-        if (!userAbbreviations[userId]) {
-          userAbbreviations[userId] = generateUniqueLetter(userId);
-        }
-
-        userIcon.textContent = userAbbreviations[userId];
-
+        const userIcon = document.createElement('i');
+        userIcon.className = 'fas fa-user user-icon';
         circle.appendChild(userIcon);
 
         activeUsersContainer.appendChild(circle);
-      });
-    });
-
-    // Function to generate unique single-letter abbreviation for the user based on user ID
-    function generateUniqueLetter(userId) {
-      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      // Use a hash of the user ID to create a unique single letter abbreviation
-      const index = hashUserId(userId) % 26;
-      const abbreviation = alphabet.charAt(index);
-      return abbreviation;
-    }
-
-    // Function to hash the user ID
-    function hashUserId(userId) {
-      // You can use a proper hashing function here for better results
-      let hash = 0;
-      for (let i = 0; i < userId.length; i++) {
-        hash = (hash << 5) - hash + userId.charCodeAt(i);
       }
-      return hash;
-    }
+    });
   </script>
 </body>
 </html>
