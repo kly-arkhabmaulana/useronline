@@ -27,39 +27,42 @@
 <body>
   <h1>Active Users: <span id="userCount">0</span></h1>
   <div id="activeUsersContainer"></div>
+  <ul id="active-users-list"></ul>
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     const activeUsersContainer = document.getElementById('activeUsersContainer');
     const userCountElement = document.getElementById('userCount');
 
-    function updateCirclesAndCounter(count) {
-      userCountElement.textContent = count;
+    function updateCirclesAndCounter(activeUsers) {
+      const activeUsersCount = activeUsers.length;
+      const initialCircleCount = Math.min(3, activeUsersCount);
+      userCountElement.textContent = activeUsersCount;
 
       activeUsersContainer.innerHTML = '';
 
-      const initialCircleCount = Math.min(3, count);
-      for (let i = 0; i < initialCircleCount; i++) {
-        const circle = document.createElement('div');
-        circle.className = 'circle';
+      for (const userId in activeUsers) {
+        if(userId < initialCircleCount) {
+          const user = activeUsers[userId];
+          const circle = document.createElement('div');
 
-        const randomAlphabet = String.fromCharCode(65 + Math.floor(Math.random() * 26));
-
-        circle.textContent = randomAlphabet;
-
-        activeUsersContainer.appendChild(circle);
+          circle.className = 'circle';
+          circle.textContent = user.name;
+          
+          activeUsersContainer.appendChild(circle);
+        }
       }
 
-      if (count > 3) {
+      if (activeUsersCount > 3) {
         const counter = document.createElement('div');
         counter.className = 'circle';
-        counter.textContent = `+${count - 3}`;
+        counter.textContent = `+${activeUsersCount - 3}`;
         activeUsersContainer.appendChild(counter);
       }
     }
 
-    socket.on('online-users', (count) => {
-      updateCirclesAndCounter(count);
+    socket.on('online-users', (activeUsers) => {
+      updateCirclesAndCounter(activeUsers);
     });
   </script>
 </body>
