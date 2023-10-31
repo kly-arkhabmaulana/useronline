@@ -1,25 +1,43 @@
 const express = require('express');
 const http = require('http');
 const socketIO = require('socket.io');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const onlineUsers = new Set();
+const activeUsers = []; // array menyimpan data user yang aktif
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-io.on('connection', (socket) => {
-  onlineUsers.add(socket.id);
+function getRandomInitial() {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const randomIndex = Math.floor(Math.random() * alphabet.length);
+  return alphabet[randomIndex];
+}
 
-  io.emit('online-users', onlineUsers.size);
+io.on('connection', (socket) => {
+  const uniqueID = uuidv4(); // generate unique id
+  const initialName = getRandomInitial(); // random alphabet
+
+  const user = { id: uniqueID, name: initialName }; // buat objek user
+  activeUsers.push(user); // menambahkan objek user ke dalam array activeUsers
+
+  socket.emit('active-users', activeUsers);
+
+  // mengirim jumlah user online ke semua user
+  io.emit('online-users', activeUsers);
 
   socket.on('disconnect', () => {
-    onlineUsers.delete(socket.id); 
-    io.emit('online-users', onlineUsers.size);
+    // menghapus user dari array saat user disconnect
+    const index = activeUsers.findIndex((u) => u.id === uniqueID);
+    if (index !== -1) {
+      activeUsers.splice(index, 1);
+      io.emit('online-users', activeUsers);
+    }
   });
 });
 
